@@ -28,6 +28,9 @@ let SheduleEmail = new Schema({
    },
    stopsnooze:{
       type:Boolean
+   },
+   userId:{
+      type:String
    }
 }, {
    collection: 'sheduleEmail'

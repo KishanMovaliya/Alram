@@ -1,6 +1,6 @@
 //----------------import packages---------------------------------
 var nodemailer = require('nodemailer');
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 
 const scheduler = require('node-schedule');
 //---------------import modal---------------------------------------
@@ -8,11 +8,13 @@ const snoozeshedule = require('../models/SnoozeModel')
 
 
 //-----------------Send Mail function using Nodemailer----------- 
-async function sendMailsnooze(req, res) {
+async function sendMailsnooze(req, res, next) {
   try {
     scheduler.scheduleJob("*/1 * * * *", function () {
       const snoozeshedules = snoozeshedule.find().then((response) => {
         response.map(a => {
+          getid = a._id
+          const setlimit = a.limitsend
           const getstatusOfSnooze = a.snoozeStatus
 
           //----------------call schedular & Send Email---------------------------------------
@@ -30,27 +32,72 @@ async function sendMailsnooze(req, res) {
             subject: "The answer to life, the universe, and everything!❤️",
             html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Stop Snooze</a></button>',
           };
+          //---------------check status snooze------------------------------
           if (getstatusOfSnooze === true) {
-            mailTransporter.sendMail(mailDetails,
-              function (err, data) {
-                if (err) {
-                  return ("Error Occurs", err)
+            //----------check limit-----------------------------------------
+            if (setlimit > 0) {
+              //--------------- mail send-----------------------------------
+              mailTransporter.sendMail(mailDetails,
+                function (err, data) {
+                  if (err) {
+                    return ("Error Occurs", err)
+                  } else {
+                    console.log('☑❤️❤️ Snooze 📧 Email Send Successfully❤️❤️', data)
+                    //----------decreament limit and update ---------------------------
+                    if (data) {
+                      var ObjectId = require('mongodb').ObjectID;
+                      let ab = setlimit - 1
+                      const snoozeLimit = {
+                        limitsend: ab
+                      }
+                      snoozeshedule.findOneAndUpdate({
+                        _id: ObjectId(getid)
+                      }, {
+                        $set: snoozeLimit
+                      }, (error, data) => {
+                        if (error) {
+                          return (error)
+                        } else {
+                          return (data)
+                        }
+                      })
+                    } //end limit update-------------------------------------------------
+                  }
+                });
+            }
+            //----------if limit == 0 update status false and limit reset--------------------------------- 
+            else if (setlimit <= 0) {
+              var ObjectId = require('mongodb').ObjectID;
+              const snoozestop = {
+                snoozeStatus: false,
+                limitsend:12
+              }
+              snoozeshedule.findOneAndUpdate({
+                _id: ObjectId(getid)
+              }, {
+                $set: snoozestop
+              }, (error, data) => {
+                if (error) {
+                  return (error)
                 } else {
-                  console.log('❤️❤️Snooze Email Send Successfully❤️❤️', data)
+                  console.log("update False Successfully")
+                  return ("update Snooze")
                 }
-              });
+              })
+            } //end if else for check limit 
+
           } else if (getstatusOfSnooze === false) {
-            console.log("~~email not send snooze its off~~")
+            console.log("✘✘✘ Email not send snooze its off ✘✘✘")
           } else(err) => {
-            console.log(err)
-          }
+            throw (err)
+          } //if part end getstatus check
+
         });
       })
       return snoozeshedules
     })
   } catch (err) {
-    console.log(err)
-    return (err)
+    throw (err)
   }
 
 

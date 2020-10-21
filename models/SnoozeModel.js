@@ -15,6 +15,9 @@ let snoozeEmail = new Schema({
    },
    snoozeStatus:{
        type:Boolean
+   },
+   limitsend:{
+      type:Number
    }
 }, {
    collection: 'snoozeEmail'

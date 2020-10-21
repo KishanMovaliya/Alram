@@ -18,27 +18,7 @@ exports.getSnoozeshedule=async (req, res) => {
  }
  
  
- //----------update Stop--------------------------------------------
- exports.updateStop=async (req, res,next) => {
-    var ObjectId = require('mongodb').ObjectID;
-    let getsnoozestop=req.body.stopsnooze
-     const stopupdte={
-        stopsnooze:getsnoozestop
-     }
-     SnoozeShedule.findOneAndUpdate( {_id : ObjectId(req.params.id)},{
-       $set:stopupdte
-     },(error,data)=>{
-       if(error){
-         console.log(error)
-         return next(error)
-       }else{
-         res.json(data)
-         return("stop Snooze")
-       }
-     })
-   }
-
-
+//---------------Update Snooze status-------------------------------------------
    exports.snoozeupdate=async (req, res,next) => {
     var ObjectId = require('mongodb').ObjectID;
      const snoozeupdate={

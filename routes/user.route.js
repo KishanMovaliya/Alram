@@ -33,13 +33,8 @@ router.delete('/deletshedule/:id', userController.deleteShedule);
 //------------getSnoozeshedule  Route api----------------------------
 router.get('/getsnooze', snnozecontroller.getSnoozeshedule)
 
-//------------updateStop  Route api----------------------------
-router.put('/stopupdate/:id', snnozecontroller.updateStop);
-
 //------------snoozeupdate  Route api----------------------------
 router.put('/snoozeupdate/:id', snnozecontroller.snoozeupdate);
-
-
 
 //------------export router-------------------------------
 module.exports = router;

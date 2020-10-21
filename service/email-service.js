@@ -1,6 +1,7 @@
+
 //----------------import packages---------------------------------
 var nodemailer = require('nodemailer');
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 
 const scheduler = require('node-schedule');
 //---------------import modal---------------------------------------
@@ -70,19 +71,20 @@ async function sendMail(req, res) {
                 if (err) {
                   return ("Error Occurs", err)
                 } else {
-                  console.log('Email sent successfully', data)
+                  console.log('☑Email sent successfully', data)
                   //---------------create snooze -----------------------------
                   let datas = new snoozeEmail({
                     email: a.email,
                     time: time,
-                    snoozeStatus: false
+                    snoozeStatus: false,
+                    limitsend: 12
                   })
                   datas.save()
-                  return ("Email sent successfully")
+                  return ("☑Email sent successfully")
                 }
               });
           } else {
-            console.log("Status is False for this email time")
+            console.log("✘Status is False for this email time")
           }
         });
       })
