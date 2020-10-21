@@ -104,6 +104,7 @@ exports.emailshedule = async (req, res) => {
 
 //----------get EmailShedule DAta----------------------------------------
 exports.getemailshedule = async (req, res) => {
+  
   try {
     let datas = await EmailShedule.find()
     res.status(200).json({
