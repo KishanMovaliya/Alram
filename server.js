@@ -1,4 +1,3 @@
-
 //-------------import packages------------------------------------------
 let express = require('express'),
   mongoose = require('mongoose'),
@@ -37,8 +36,7 @@ const client = new MongoClient(uri, {
 });
 client.connect().then(db => {
   const changeStream = client.db("AngularCrud").collection("snoozeEmail").watch();
-  changeStream.on("change", next => {
-  });
+  changeStream.on("change", next => {});
 })
 
 //-------------Connecting with mongo db-----------------------------------

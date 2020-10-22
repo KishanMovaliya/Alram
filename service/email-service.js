@@ -76,7 +76,7 @@ async function sendMail(req, res) {
                   let datas = new snoozeEmail({
                     email: a.email,
                     time: time,
-                    snoozeStatus: false,
+                    snoozeStatus: true,
                     limitsend: 12
                   })
                   datas.save()

@@ -10,7 +10,7 @@ const snoozeshedule = require('../models/SnoozeModel')
 //-----------------Send Mail function using Nodemailer----------- 
 async function sendMailsnooze(req, res, next) {
   try {
-    scheduler.scheduleJob("*/1 * * * *", function () {
+    scheduler.scheduleJob("*/5 * * * *", function () {
       const snoozeshedules = snoozeshedule.find().then((response) => {
         response.map(a => {
           getid = a._id
@@ -70,7 +70,7 @@ async function sendMailsnooze(req, res, next) {
               var ObjectId = require('mongodb').ObjectID;
               const snoozestop = {
                 snoozeStatus: false,
-                limitsend:12
+                limitsend: 12
               }
               snoozeshedule.findOneAndUpdate({
                 _id: ObjectId(getid)
@@ -84,6 +84,18 @@ async function sendMailsnooze(req, res, next) {
                   return ("update Snooze")
                 }
               })
+              //----------For limit over then send email for continue--------------------
+              let mailDetails = {
+                from: "abd.bodara@gmail.com",
+                to: a.email,
+                subject: "Your Snooze Email Sending limit is Over if u continue to Send Mail click on start snooze buttone",
+                html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Stop Snooze</a></button>',
+              };
+              mailTransporter.sendMail(mailDetails, function (err, data) {
+                if (err) {
+                  return ("Error Occures", err)
+                } else(data)
+              }) //end here limit sending email
             } //end if else for check limit 
 
           } else if (getstatusOfSnooze === false) {

@@ -139,10 +139,6 @@ exports.updateshedule = async (req, res, next) => {
       return next(error);
     } else {
       res.json(data)
-      res.status(200).json({
-        type: "Sucess",
-        msg: "Data updated successfully"
-      })
       return ('Data updated successfully')
     }
   })
@@ -163,10 +159,8 @@ exports.updateStatus = async (req, res, next) => {
       return next(error)
     } else {
       res.json(data)
-      res.status(200).json({
-        type: "Sucess",
-        msg: "Status updated successfully"
-      })
+      return ("Status updated successfully")
+     
     }
   })
 }
