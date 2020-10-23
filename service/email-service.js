@@ -77,7 +77,8 @@ async function sendMail(req, res) {
                     email: a.email,
                     time: time,
                     snoozeStatus: true,
-                    limitsend: 12
+                    limitsend: 12,
+                    notification:0
                   })
                   datas.save()
                   return ("☑Email sent successfully")

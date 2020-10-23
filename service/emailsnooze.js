@@ -1,6 +1,6 @@
 //----------------import packages---------------------------------
 var nodemailer = require('nodemailer');
-
+const notifier = require('node-notifier');
 
 const scheduler = require('node-schedule');
 //---------------import modal---------------------------------------
@@ -10,11 +10,12 @@ const snoozeshedule = require('../models/SnoozeModel')
 //-----------------Send Mail function using Nodemailer----------- 
 async function sendMailsnooze(req, res, next) {
   try {
-    scheduler.scheduleJob("*/5 * * * *", function () {
+    scheduler.scheduleJob(" */5 * * * *", function () {
       const snoozeshedules = snoozeshedule.find().then((response) => {
         response.map(a => {
           getid = a._id
           const setlimit = a.limitsend
+          const getnotification=a.notification
           const getstatusOfSnooze = a.snoozeStatus
 
           //----------------call schedular & Send Email---------------------------------------
@@ -43,12 +44,26 @@ async function sendMailsnooze(req, res, next) {
                     return ("Error Occurs", err)
                   } else {
                     console.log('☑❤️❤️ Snooze 📧 Email Send Successfully❤️❤️', data)
+                    notifier.notify('☑❤️❤️ New Email Recieve☑❤️❤️ ');
+                    notifier.notify({
+                      'title': 'The answer to life, the universe, and everything!❤️',
+                      'subtitle': 'Mail send',
+                      'message': 'Click "reply" to send a message back!',
+                      'icon': 'dwb-logo.png',
+                      'contentImage': 'blog.png',
+                      'sound': 'ding.mp3',
+                      'wait': true
+                    });
+                    notifier.on('click', (obj,options)=>{})
+                    notifier.on('close', (obj, options) => {});
                     //----------decreament limit and update ---------------------------
                     if (data) {
                       var ObjectId = require('mongodb').ObjectID;
                       let ab = setlimit - 1
+                      let note=getnotification + 1
                       const snoozeLimit = {
-                        limitsend: ab
+                        limitsend: ab,
+                        notification:note
                       }
                       snoozeshedule.findOneAndUpdate({
                         _id: ObjectId(getid)
@@ -66,7 +81,7 @@ async function sendMailsnooze(req, res, next) {
                 });
             }
             //----------if limit == 0 update status false and limit reset--------------------------------- 
-            else if (setlimit <= 0) {
+            else if (setlimit <= 0 ) {
               var ObjectId = require('mongodb').ObjectID;
               const snoozestop = {
                 snoozeStatus: false,

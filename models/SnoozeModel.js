@@ -18,7 +18,11 @@ let snoozeEmail = new Schema({
    },
    limitsend:{
       type:Number
+   },
+   notification:{
+      type:Number
    }
+   
 }, {
    collection: 'snoozeEmail'
 })
