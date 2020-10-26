@@ -1,7 +1,6 @@
-
 //----------------import packages---------------------------------
 var nodemailer = require('nodemailer');
-
+const notifier = require('node-notifier');
 
 const scheduler = require('node-schedule');
 //---------------import modal---------------------------------------
@@ -14,6 +13,12 @@ async function sendMail(req, res) {
   try {
     const EmailSchedule = EmailShedule.find().then((response) => {
       response.map(a => {
+        const getusers = JSON.parse(JSON.stringify(a.useremail))
+        const useremail = getusers.map(item => item)
+        const getemailuser = useremail.toString()
+
+
+
         //---------------DayOfWeek Get -----------------------------------------
         //  let  daysget = JSON.parse(JSON.stringify(a.day));
         //   const dayconvert=daysget.map(item => item.day) 
@@ -53,6 +58,7 @@ async function sendMail(req, res) {
         let mailDetails = {
           from: "abd.bodara@gmail.com",
           to: a.email,
+          getemailuser,
           subject: "The answer to life, the universe, and everything!❤️",
           html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn"">Stop Snooze</a></button>',
 
@@ -71,28 +77,57 @@ async function sendMail(req, res) {
                 if (err) {
                   return ("Error Occurs", err)
                 } else {
-                  console.log('☑Email sent successfully', data)
+                  notifier.notify('☑❤️❤️ First  Email Recieve ☑❤️❤️ ');
+                  notifier.notify({
+                    'title': a.email,
+                    getemailuser,
+                    'subtitle': 'The answer to life, the universe, and everything!❤️',
+                    'message': 'The answer to life, the universe, and everything!❤️',
+                    'icon': 'dwb-logo.png',
+                    'contentImage': 'blog.png',
+                    'sound': 'ding.mp3',
+                    'wait': true
+                  });
+                  notifier.on('click', (obj, options) => {})
+                  notifier.on('close', (obj, options) => {});
                   //---------------create snooze -----------------------------
                   let datas = new snoozeEmail({
                     email: a.email,
                     time: time,
                     snoozeStatus: true,
                     limitsend: 12,
-                    notification:0
+                    notification: 0
                   })
                   datas.save()
+                  //----------new user add email snooze--------------------
+                  let multidata = new snoozeEmail({
+                    email: getemailuser,
+                    time: time,
+                    snoozeStatus: true,
+                    limitsend: 12,
+                    notification: 0
+                  })
+                  multidata.save()
                   return ("☑Email sent successfully")
+
                 }
               });
+
           } else {
-            console.log("✘Status is False for this email time")
+            res.status(400).json({
+              type: "Not Send",
+              msg: "false"
+            })
           }
         });
       })
     })
     return EmailSchedule
   } catch (err) {
-    console.log(err)
+    res.status(400).json({
+      type: "err",
+      msg: err
+    })
     return (err)
   }
 

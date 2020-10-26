@@ -25,17 +25,17 @@ const userSchema = new Schema({
 });
 
 //--------------hashpassword---------------------------------
-userSchema.methods.hashPassword = async(password) => {
+userSchema.methods.hashPassword = async (password) => {
     return await bcrypt.hashSync(password, 10);
 }
 
 //--------------compare password------------------------------
-userSchema.methods.compareUserPassword = async(inputtedPassword, hashedPassword) => {
+userSchema.methods.compareUserPassword = async (inputtedPassword, hashedPassword) => {
     return await bcrypt.compare(inputtedPassword, hashedPassword)
 }
 
 //--------------genrate token---------------------------------
-userSchema.methods.generateJwtToken = async(payload, secret, expires) => {
+userSchema.methods.generateJwtToken = async (payload, secret, expires) => {
     return jwt.sign(payload, secret, expires)
 }
 

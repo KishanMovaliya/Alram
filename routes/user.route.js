@@ -7,8 +7,6 @@ const userController = require("../Controller/userController");
 const snnozecontroller = require("../Controller/snoozeController")
 const checkUserToken = require("../service/tokenmiddleware")
 
-//------------middleware----------------------------------------
-const verify = require("../middleware/auth")
 
 //------------Defined the Router api-----------------------------
 
@@ -18,29 +16,41 @@ router.post("/register", userController.registerNewUser);
 //------------loginUser user Route api----------------------------
 router.post("/login", userController.loginUser);
 
+//------------loginUser get user Route api----------------------------
+router.get("/profile", checkUserToken, userController.getloginuser);
+
+//------------logout user Route api----------------------------
+router.get("/logout", checkUserToken, userController.logout);
+
 //------------emailshedule  Route api----------------------------
-router.post('/sheduleemail', userController.emailshedule);
+router.post('/sheduleemail', checkUserToken, userController.emailshedule);
 
 //------------updateshedule  Route api----------------------------
-router.put('/updateShedule/:id', userController.updateshedule);
+router.put('/updateShedule/:id', checkUserToken, userController.updateshedule);
 
 //------------updateStatus  Route api----------------------------
-router.put('/status/:id', userController.updateStatus);
+router.put('/status/:id', checkUserToken, userController.updateStatus);
 
 //------------getemailshedule  Route api----------------------------
 router.get('/getemailshedule', checkUserToken, userController.getemailshedule);
 
 //------------deleteShedule  Route api----------------------------
-router.delete('/deletshedule/:id', userController.deleteShedule);
+router.delete('/deletshedule/:id', checkUserToken, userController.deleteShedule);
 
 //------------getSnoozeshedule  Route api----------------------------
-router.get('/getsnooze', snnozecontroller.getSnoozeshedule)
+router.get('/getsnooze', checkUserToken, snnozecontroller.getSnoozeshedule)
 
 //------------snoozeupdate  Route api----------------------------
-router.put('/snoozeupdate/:id', snnozecontroller.snoozeupdate);
+router.put('/snoozeupdate/:id', checkUserToken, snnozecontroller.snoozeupdate);
 
 //------------get notification ---------------------------
-router.get('/getnotification', snnozecontroller.getnotification);
+router.get('/getnotification', checkUserToken, snnozecontroller.getnotification);
+
+//-----------getuser------------------------------------------- 
+router.get('/getusers', checkUserToken, userController.getuser);
+
+//-----------useremail add--------------------------------------
+router.put('/adduser/:id', checkUserToken, userController.getemailuseradd);
 
 //------------export router-------------------------------
 module.exports = router;

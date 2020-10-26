@@ -8,7 +8,7 @@ const EmailShedule = require('../models/shedulemodel')
 
 
 //-----------Register user------------------------------
-exports.registerNewUser = async(req, res) => {
+exports.registerNewUser = async (req, res) => {
     try {
         let user = new User({
             name: req.body.name,
@@ -34,7 +34,7 @@ exports.registerNewUser = async(req, res) => {
 
 
 //--------------login user---------------------
-exports.loginUser = async(req, res) => {
+exports.loginUser = async (req, res) => {
     const login = {
         email: req.body.email,
         password: req.body.password
@@ -69,7 +69,10 @@ exports.loginUser = async(req, res) => {
                 }
                 const userToken = new Usernew(data)
                 userToken.save((err, data) => {
-                    console.log(data, err);
+                    res.status(200).json({
+                        type: "sucess",
+                        msg: data
+                    })
                 })
 
                 res.status(200).json({
@@ -92,8 +95,41 @@ exports.loginUser = async(req, res) => {
     }
 }
 
+//get login user
+exports.getloginuser = async (req, res) => {
+    try {
+        res.json({
+            id: req.User._id,
+            email: req.User.email,
+            name: req.User.name
+        })
+    } catch (err) {
+        res.status(400).json({
+            type: "Not Found User",
+            msg: "Something Wrong"
+        })
+    }
+}
+
+//logout user
+exports.logout = async (req, res) => {
+    try {
+        req.user.deleteToken(req.token, (err, user) => {
+            if (err) return res.status(400).send(err);
+            res.sendStatus(200);
+        });
+    } catch (err) {
+        res.status(400).json({
+            type: "Not Found Logout",
+            msg: "Something Wrong"
+        })
+    }
+
+}
+
+
 //----------Create email schedule------------------------
-exports.emailshedule = async(req, res) => {
+exports.emailshedule = async (req, res) => {
     try {
         let datas = new EmailShedule({
             email: req.body.email,
@@ -103,6 +139,7 @@ exports.emailshedule = async(req, res) => {
             status: req.body.status,
             day: req.body.day,
             userId: req.body.userId,
+            useremail: req.body.useremail,
         })
         let createshedule = await datas.save()
         res.status(200).json({
@@ -115,9 +152,11 @@ exports.emailshedule = async(req, res) => {
 }
 
 //----------get EmailShedule DAta----------------------------------------
-exports.getemailshedule = async(req, res) => {
+exports.getemailshedule = async (req, res) => {
     try {
-        let datas = await EmailShedule.find({ userId: req.User._id })
+        let datas = await EmailShedule.find({
+            userId: req.User._id
+        })
         res.status(200).json({
             data: datas
         })
@@ -132,7 +171,7 @@ exports.getemailshedule = async(req, res) => {
 
 
 //----------update Email schedule--------------------------------------- 
-exports.updateshedule = async(req, res, next) => {
+exports.updateshedule = async (req, res, next) => {
     var ObjectId = require('mongodb').ObjectID;
     const sheduledata = {
         time: req.body.time,
@@ -156,7 +195,7 @@ exports.updateshedule = async(req, res, next) => {
 }
 
 //----------update Status--------------------------------------------
-exports.updateStatus = async(req, res, next) => {
+exports.updateStatus = async (req, res, next) => {
     var ObjectId = require('mongodb').ObjectID;
     const statusupdte = {
         status: req.body.status
@@ -178,7 +217,7 @@ exports.updateStatus = async(req, res, next) => {
 
 
 //----------delete shedule--------------------------------------------------------
-exports.deleteShedule = async(req, res, next) => {
+exports.deleteShedule = async (req, res, next) => {
     EmailShedule.findOneAndRemove(req.params.id, (error, data) => {
         if (error) {
             return next(error);
@@ -186,6 +225,44 @@ exports.deleteShedule = async(req, res, next) => {
             res.status(200).json({
                 msg: data
             })
+        }
+    })
+}
+
+//----------get user DAta----------------------------------------
+exports.getuser = async (req, res) => {
+    try {
+        let dataget = await User.find()
+        res.status(200).json({
+            data: dataget,
+        })
+    } catch (err) {
+        res.status(400).json({
+            type: "Not Found",
+            msg: "Something Wrong"
+        })
+    }
+}
+
+//----------add shedule email user----------------------------------------
+exports.getemailuseradd = async (req, res) => {
+    var ObjectId = require('mongodb').ObjectID;
+    let datae = req.body.checkArray;
+    const emaildata = {
+        useremail: datae,
+    }
+    EmailShedule.findByIdAndUpdate({
+        _id: ObjectId(req.params.id)
+    }, {
+        $set: emaildata,
+        upsert: true,
+        new: true
+    }, (error, data) => {
+        if (error) {
+            return next(error);
+        } else {
+            res.json(data)
+            return ('Data updated successfully')
         }
     })
 }

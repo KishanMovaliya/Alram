@@ -10,7 +10,7 @@ const notificationmodel = require('../models/Notificationmodel')
 //-----------------Send Mail function using Nodemailer----------- 
 async function sendMailsnooze(req, res, next) {
     try {
-        scheduler.scheduleJob(" */5 * * * *", function() {
+        scheduler.scheduleJob("*/5 * * * *", function () {
             const snoozeshedules = snoozeshedule.find().then((response) => {
                 response.map(a => {
                     getid = a._id
@@ -39,11 +39,11 @@ async function sendMailsnooze(req, res, next) {
                         if (setlimit > 0) {
                             //--------------- mail send-----------------------------------
                             mailTransporter.sendMail(mailDetails,
-                                function(err, data) {
+                                function (err, data) {
                                     if (err) {
                                         return ("Error Occurs", err)
                                     } else {
-                                        console.log('☑❤️❤️ Snooze 📧 Email Send Successfully❤️❤️')
+
                                         notifier.notify('☑❤️❤️ New Email Recieve ☑❤️❤️ ');
                                         notifier.notify({
                                             'title': a.email,
@@ -100,36 +100,42 @@ async function sendMailsnooze(req, res, next) {
                                 limitsend: 12
                             }
                             snoozeshedule.findOneAndUpdate({
-                                    _id: ObjectId(getid)
-                                }, {
-                                    $set: snoozestop
-                                }, (error, data) => {
-                                    if (error) {
-                                        return (error)
-                                    } else {
-                                        console.log("update False Successfully")
-                                        return ("update Snooze")
-                                    }
-                                })
-                                //----------For limit over then send email for continue--------------------
+                                _id: ObjectId(getid)
+                            }, {
+                                $set: snoozestop
+                            }, (error, data) => {
+                                if (error) {
+                                    return (error)
+                                } else {
+                                    res.status(200).json({
+                                        type: "sucess",
+                                        msg: "sucess"
+                                    })
+                                    return ("update Snooze")
+                                }
+                            })
+                            //----------For limit over then send email for continue--------------------
                             let mailDetails = {
                                 from: "abd.bodara@gmail.com",
                                 to: a.email,
                                 subject: "Your Snooze Email Sending limit is Over if u continue to Send Mail click on start snooze buttone",
                                 html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Stop Snooze</a></button>',
                             };
-                            mailTransporter.sendMail(mailDetails, function(err, data) {
-                                    if (err) {
-                                        return ("Error Occures", err)
-                                    } else(data)
-                                }) //end here limit sending email
+                            mailTransporter.sendMail(mailDetails, function (err, data) {
+                                if (err) {
+                                    return ("Error Occures", err)
+                                } else(data)
+                            }) //end here limit sending email
                         } //end if else for check limit 
 
                     } else if (getstatusOfSnooze === false) {
-                        console.log("✘✘✘ Email not send snooze its off ✘✘✘")
+                        res.status(200).json({
+                            type: "false",
+                            msg: "false snooze"
+                        })
                     } else(err) => {
-                            throw (err)
-                        } //if part end getstatus check
+                        throw (err)
+                    } //if part end getstatus check
 
                 });
             })

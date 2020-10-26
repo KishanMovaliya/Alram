@@ -1,6 +1,8 @@
 //-----------import packages------------------------------------
 const express = require('express');
-const { default: Swal } = require('sweetalert2');
+const {
+  default: Swal
+} = require('sweetalert2');
 const app = express();
 const employeeRoute = express.Router();
 
@@ -50,7 +52,7 @@ employeeRoute.route('/update/:id').put((req, res, next) => {
       return next(error);
     } else {
       res.json(data)
-      return('Data updated successfully')
+      return ('Data updated successfully')
     }
   })
 })
@@ -58,13 +60,13 @@ employeeRoute.route('/update/:id').put((req, res, next) => {
 //-----------Delete employee---------------------------------------
 employeeRoute.route('/delete/:id').delete((req, res, next) => {
   Employee.findOneAndRemove(req.params.id, (error, data) => {
-      if (error) {
-        return next(error);
-      } else {
-        res.status(200).json({
-          msg: data
-        })  
-      }
+    if (error) {
+      return next(error);
+    } else {
+      res.status(200).json({
+        msg: data
+      })
+    }
   })
 })
 

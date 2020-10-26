@@ -7,22 +7,22 @@ let snoozeEmail = new Schema({
    email: {
       type: String
    },
-   time:{
-      type:String
+   time: {
+      type: String
    },
-   stopsnooze:{
-      type:Boolean
+   stopsnooze: {
+      type: Boolean
    },
-   snoozeStatus:{
-       type:Boolean
+   snoozeStatus: {
+      type: Boolean
    },
-   limitsend:{
-      type:Number
+   limitsend: {
+      type: Number
    },
-   notification:{
-      type:Number
+   notification: {
+      type: Number
    }
-   
+
 }, {
    collection: 'snoozeEmail'
 })
