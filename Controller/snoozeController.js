@@ -2,6 +2,7 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 //----------import model
 const SnoozeShedule = require('../models/SnoozeModel')
+const notificationmodel=require('../models/Notificationmodel')
 
 
 
@@ -17,6 +18,18 @@ exports.getSnoozeshedule=async (req, res) => {
    }catch (err) {}
  }
  
+ exports.getnotification=async (req, res)=>{
+   try{
+     let notefication= await notificationmodel.find()
+     res.status(200).json({
+       data:notefication
+     })
+   }catch (err) {
+     res.status(400)
+   }
+ }
+
+
  
 //---------------Update Snooze status-------------------------------------------
    exports.snoozeupdate=async (req, res,next) => {

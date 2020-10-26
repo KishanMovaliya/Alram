@@ -5,7 +5,10 @@ const router = express.Router();
 //------------import usercontroller file---------------
 const userController = require("../Controller/userController");
 const snnozecontroller = require("../Controller/snoozeController")
+const checkUserToken = require("../service/tokenmiddleware")
 
+//------------middleware----------------------------------------
+const verify = require("../middleware/auth")
 
 //------------Defined the Router api-----------------------------
 
@@ -25,7 +28,7 @@ router.put('/updateShedule/:id', userController.updateshedule);
 router.put('/status/:id', userController.updateStatus);
 
 //------------getemailshedule  Route api----------------------------
-router.get('/getemailshedule', userController.getemailshedule);
+router.get('/getemailshedule', checkUserToken, userController.getemailshedule);
 
 //------------deleteShedule  Route api----------------------------
 router.delete('/deletshedule/:id', userController.deleteShedule);
@@ -35,6 +38,9 @@ router.get('/getsnooze', snnozecontroller.getSnoozeshedule)
 
 //------------snoozeupdate  Route api----------------------------
 router.put('/snoozeupdate/:id', snnozecontroller.snoozeupdate);
+
+//------------get notification ---------------------------
+router.get('/getnotification', snnozecontroller.getnotification);
 
 //------------export router-------------------------------
 module.exports = router;
