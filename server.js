@@ -11,7 +11,7 @@ let express = require('express'),
 //-------------import the email service  & email snpooze-----------------------------------
 const emailService = require('./service/email-service');
 const emailsnoozeService = require('./service/emailsnooze');
-const checkUserToken = require('./service/tokenmiddleware')
+
 
 //--------------Watch Changes database--------------------------
 const socket_io = require('socket.io');
@@ -59,9 +59,6 @@ emailService.sendMail()
 //-------------After First Email Send Snooze---------------------------
 emailsnoozeService.sendMailsnooze()
 
-//---------------Setting up port with express js----------------------------
-const employeeRoute = require('../backend/routes/employee.route')
-
 //----------------User route for login signup---------------------------------
 const userRoutes = require('../backend/routes/user.route')
 
@@ -81,8 +78,6 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cors());
 
-//--------------api for crud---------------------------------------------------------
-app.use('/api', employeeRoute)
 
 //--------------api for authentication Email Crud-----------------------------------------------
 app.use('/user', userRoutes)

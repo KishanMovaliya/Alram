@@ -9,7 +9,7 @@ const snoozeEmail = require('../models/SnoozeModel');
 
 
 //-----------------Send Mail function using Nodemailer----------- 
-async function sendMail(req, res) {
+async function sendMail(req, res,next) {
   try {
     const EmailSchedule = EmailShedule.find().then((response) => {
       response.map(a => {
@@ -46,6 +46,11 @@ async function sendMail(req, res) {
 
         //-----------------Assign Date In month and Date
         const date = dates.getDate()
+          
+        var maillist = [
+          a.email,
+          getemailuser
+        ];
 
         let mailTransporter = nodemailer.createTransport({
           service: "gmail",
@@ -57,8 +62,7 @@ async function sendMail(req, res) {
         //---------------Setting credentials-----------------------------
         let mailDetails = {
           from: "abd.bodara@gmail.com",
-          to: a.email,
-          getemailuser,
+          to: maillist,
           subject: "The answer to life, the universe, and everything!❤️",
           html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn"">Stop Snooze</a></button>',
 
@@ -79,8 +83,7 @@ async function sendMail(req, res) {
                 } else {
                   notifier.notify('☑❤️❤️ First  Email Recieve ☑❤️❤️ ');
                   notifier.notify({
-                    'title': a.email,
-                    getemailuser,
+                    'title': a.email || getemailuser,
                     'subtitle': 'The answer to life, the universe, and everything!❤️',
                     'message': 'The answer to life, the universe, and everything!❤️',
                     'icon': 'dwb-logo.png',
@@ -109,25 +112,16 @@ async function sendMail(req, res) {
                   })
                   multidata.save()
                   return ("☑Email sent successfully")
-
                 }
               });
 
           } else {
-            res.status(400).json({
-              type: "Not Send",
-              msg: "false"
-            })
           }
         });
       })
     })
     return EmailSchedule
   } catch (err) {
-    res.status(400).json({
-      type: "err",
-      msg: err
-    })
     return (err)
   }
 

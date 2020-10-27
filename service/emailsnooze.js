@@ -10,7 +10,7 @@ const notificationmodel = require('../models/Notificationmodel')
 //-----------------Send Mail function using Nodemailer----------- 
 async function sendMailsnooze(req, res, next) {
     try {
-        scheduler.scheduleJob("*/5 * * * *", function () {
+        scheduler.scheduleJob("*/10 * * * * *", function () {
             const snoozeshedules = snoozeshedule.find().then((response) => {
                 response.map(a => {
                     getid = a._id
@@ -18,6 +18,10 @@ async function sendMailsnooze(req, res, next) {
                     const getnotification = a.notification
                     const getstatusOfSnooze = a.snoozeStatus
 
+
+                    var maillist = [
+                        a.email,
+                    ];
                     //----------------call schedular & Send Email---------------------------------------
                     let mailTransporter = nodemailer.createTransport({
                         service: "gmail",
@@ -29,7 +33,7 @@ async function sendMailsnooze(req, res, next) {
                     //---------------Setting credentials-----------------------------
                     let mailDetails = {
                         from: "abd.bodara@gmail.com",
-                        to: a.email,
+                        to: maillist,
                         subject: "The answer to life, the universe, and everything!❤️",
                         html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Stop Snooze</a></button>',
                     };
@@ -70,7 +74,6 @@ async function sendMailsnooze(req, res, next) {
                                             getdatanotification.save()
 
 
-                                            var ObjectId = require('mongodb').ObjectID;
                                             let ab = setlimit - 1
                                             let note = getnotification + 1
                                             const snoozeLimit = {
@@ -78,7 +81,7 @@ async function sendMailsnooze(req, res, next) {
                                                 notification: note
                                             }
                                             snoozeshedule.findOneAndUpdate({
-                                                _id: ObjectId(getid)
+                                                _id: (a._id)
                                             }, {
                                                 $set: snoozeLimit
                                             }, (error, data) => {
@@ -107,17 +110,13 @@ async function sendMailsnooze(req, res, next) {
                                 if (error) {
                                     return (error)
                                 } else {
-                                    res.status(200).json({
-                                        type: "sucess",
-                                        msg: "sucess"
-                                    })
                                     return ("update Snooze")
                                 }
                             })
                             //----------For limit over then send email for continue--------------------
                             let mailDetails = {
                                 from: "abd.bodara@gmail.com",
-                                to: a.email,
+                                to: maillist,
                                 subject: "Your Snooze Email Sending limit is Over if u continue to Send Mail click on start snooze buttone",
                                 html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Stop Snooze</a></button>',
                             };
@@ -125,15 +124,22 @@ async function sendMailsnooze(req, res, next) {
                                 if (err) {
                                     return ("Error Occures", err)
                                 } else(data)
+                                notifier.notify('😱Snooze Email limit is Over');
+                                notifier.notify({
+                                    'title': maillist,
+                                    'subtitle': '😱Your Snooze Email Sending limit is Over😱',
+                                    'message': 'if u continue to Send Mail click on start snooze buttone',
+                                    'icon': 'dwb-logo.png',
+                                    'contentImage': 'blog.png',
+                                    'sound': 'ding.mp3',
+                                    'wait': true
+                                });
+                                notifier.on('click', (obj, options) => {})
+                                notifier.on('close', (obj, options) => {});
                             }) //end here limit sending email
                         } //end if else for check limit 
 
-                    } else if (getstatusOfSnooze === false) {
-                        res.status(200).json({
-                            type: "false",
-                            msg: "false snooze"
-                        })
-                    } else(err) => {
+                    } else if (getstatusOfSnooze === false) {} else(err) => {
                         throw (err)
                     } //if part end getstatus check
 
