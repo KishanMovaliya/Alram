@@ -52,5 +52,12 @@ router.get('/getusers', checkUserToken, userController.getuser);
 //-----------useremail add--------------------------------------
 router.put('/adduser/:id', checkUserToken, userController.getemailuseradd);
 
+//-----------token add --------------------------------------
+router.post('/addtoken', checkUserToken, userController.gettoken);
+
+//------------token get notificationOptions-------------------------------- 
+router.get('/notificationtokenget', checkUserToken,userController.gettokenNotification)
+
+
 //------------export router-------------------------------
 module.exports = router;

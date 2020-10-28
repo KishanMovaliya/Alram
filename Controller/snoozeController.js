@@ -1,5 +1,5 @@
  //----------------import packages---------------------------------
- process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
  //----------import model
  const SnoozeShedule = require('../models/SnoozeModel')
  const notificationmodel = require('../models/Notificationmodel')
@@ -18,10 +18,11 @@
    } catch (err) {}
  }
 
+ //----------get notificationmodel DAta-----------------------------
  exports.getnotification = async (req, res) => {
    try {
      let notefication = await notificationmodel.find({
-       userId: req.User._id
+      useremail: req.User.email
      })
      res.status(200).json({
        data: notefication

@@ -6,18 +6,30 @@ const scheduler = require('node-schedule');
 //---------------import modal---------------------------------------
 const EmailShedule = require('../models/shedulemodel');
 const snoozeEmail = require('../models/SnoozeModel');
+const UserToken = require('../models/TokenNotification')
+
+//---------------fcm require------------------------------------------
+var FCM = require('fcm-node');
+var serverKey = 'AAAAHV8fXR4:APA91bGmZflZantZw8gYX2TTv_yNy0TRwdXosruwSziVAUyGEuwrdzZ8reiFFRYN9s9ZP8zTs2bHw_S3QPapryow5yEmNP3rZRnfnchmrv5KfOqWaNNLw0YiWYKZf2gfpl13V4u0z_Ap'; //put your server key here
+var fcm = new FCM(serverKey);
 
 
 //-----------------Send Mail function using Nodemailer----------- 
-async function sendMail(req, res) {
+async function sendMail(req, res,next) {
   try {
     const EmailSchedule = EmailShedule.find().then((response) => {
+      const getitem = UserToken.find()
+              let gettoken
+              getitem.then(res => {
+                  res.map(b => {
+                       gettoken = b.notificationToken 
+                  })
+                  console.log("emailservice", gettoken)
+              })
       response.map(a => {
         const getusers = JSON.parse(JSON.stringify(a.useremail))
         const useremail = getusers.map(item => item)
         const getemailuser = useremail.toString()
-
-
 
         //---------------DayOfWeek Get -----------------------------------------
         //  let  daysget = JSON.parse(JSON.stringify(a.day));
@@ -46,6 +58,12 @@ async function sendMail(req, res) {
 
         //-----------------Assign Date In month and Date
         const date = dates.getDate()
+          
+        var maillist = [
+          a.email,
+          getemailuser
+        ];
+
 
         let mailTransporter = nodemailer.createTransport({
           service: "gmail",
@@ -57,8 +75,7 @@ async function sendMail(req, res) {
         //---------------Setting credentials-----------------------------
         let mailDetails = {
           from: "abd.bodara@gmail.com",
-          to: a.email,
-          getemailuser,
+          to: maillist,
           subject: "The answer to life, the universe, and everything!❤️",
           html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn"">Stop Snooze</a></button>',
 
@@ -77,19 +94,34 @@ async function sendMail(req, res) {
                 if (err) {
                   return ("Error Occurs", err)
                 } else {
-                  notifier.notify('☑❤️❤️ First  Email Recieve ☑❤️❤️ ');
-                  notifier.notify({
-                    'title': a.email,
-                    getemailuser,
-                    'subtitle': 'The answer to life, the universe, and everything!❤️',
-                    'message': 'The answer to life, the universe, and everything!❤️',
-                    'icon': 'dwb-logo.png',
-                    'contentImage': 'blog.png',
-                    'sound': 'ding.mp3',
-                    'wait': true
+                  if(gettoken){
+                    var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+                      to: gettoken, 
+                      collapse_key: 'your_collapse_key',
+                      
+                      notification: {
+                          title: '☑❤️❤️ First  Email Recieve ☑❤️❤️ ', 
+                          body: 'The answer to life, the universe, and everything!❤️' 
+                      },
+                      
+                      data: {  //you can send only notification or only data(or include both)
+                          my_key: 'my value',
+                          my_another_key: 'my another value'
+                      }
+                  };
+                  
+                  fcm.send(message, function(err, response){
+                      if (err) {
+                          console.log("Something has gone wrong!");
+                      } else {
+                          console.log("Successfully sent with response: ", response);
+                      }
                   });
-                  notifier.on('click', (obj, options) => {})
-                  notifier.on('close', (obj, options) => {});
+                  }
+                  else{
+                    console.log("token not register")
+                  }
+              
                   //---------------create snooze -----------------------------
                   let datas = new snoozeEmail({
                     email: a.email,
@@ -100,34 +132,29 @@ async function sendMail(req, res) {
                   })
                   datas.save()
                   //----------new user add email snooze--------------------
-                  let multidata = new snoozeEmail({
-                    email: getemailuser,
-                    time: time,
-                    snoozeStatus: true,
-                    limitsend: 12,
-                    notification: 0
-                  })
-                  multidata.save()
-                  return ("☑Email sent successfully")
 
+                  useremail.map(res=>{
+                    let multidata = new snoozeEmail({
+                      email: res,
+                      time: time,
+                      snoozeStatus: true,
+                      limitsend: 12,
+                      notification: 0
+        
+                    })
+                    multidata.save()
+                    return ("☑Email sent successfully")
+                  })
                 }
               });
 
           } else {
-            res.status(400).json({
-              type: "Not Send",
-              msg: "false"
-            })
           }
         });
       })
     })
     return EmailSchedule
   } catch (err) {
-    res.status(400).json({
-      type: "err",
-      msg: err
-    })
     return (err)
   }
 

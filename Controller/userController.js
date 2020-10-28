@@ -1,11 +1,10 @@
 //----------------import packages---------------------------------
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 //-----------import modals------------------------------
 const User = require("../models/users");
 const Usernew = require('../models/usernew')
 const EmailShedule = require('../models/shedulemodel')
-
+const TokenNotificationModel = require('../models/TokenNotification')
 
 //-----------Register user------------------------------
 exports.registerNewUser = async (req, res) => {
@@ -140,6 +139,7 @@ exports.emailshedule = async (req, res) => {
             day: req.body.day,
             userId: req.body.userId,
             useremail: req.body.useremail,
+            notificationToken: req.body.notificationToken,
         })
         let createshedule = await datas.save()
         res.status(200).json({
@@ -265,4 +265,47 @@ exports.getemailuseradd = async (req, res) => {
             return ('Data updated successfully')
         }
     })
+}
+
+//----------add token-----------------------------------------------------
+exports.gettoken = async (req, res) => {
+    try {
+        let user = await TokenNotificationModel.findOne({
+            notificationToken: req.body.notificationToken
+        });
+        if (user) {
+            return res.status(400).send('That Token already exisits!');
+        } else {
+            let datas = new TokenNotificationModel({
+                email: req.body.email,
+                userId: req.body.userId,
+                notificationToken: req.body.notificationToken,
+            })
+            let createtoken = await datas.save()
+            console.log(createtoken)
+            res.status(200).json({
+                msg: "User Token Update Successfully",
+                data: createtoken
+            })
+        }
+    } catch (err) {
+    }
+}
+
+//----------get token DAta----------------------------------------
+exports.gettokenNotification = async (req, res) => {
+    try {
+        let datas = await TokenNotificationModel.find({
+            userId: req.User._id
+        })
+        res.status(200).json({
+            data: datas
+        })
+
+    } catch (err) {
+        res.status(400).json({
+            type: "Not Found",
+            msg: "Something Wrong"
+        })
+    }
 }
