@@ -21,6 +21,9 @@ let snoozeEmail = new Schema({
    },
    notification: {
       type: Number
+   },
+   userId:{
+      type: String
    }
 
 }, {

@@ -20,6 +20,9 @@ const userSchema = new Schema({
         required: true,
         unique: true
     },
+    isStatus:{
+        type: Boolean
+    }
 }, {
     timestamps: true,
 });

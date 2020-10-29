@@ -43,21 +43,14 @@ router.get('/getsnooze', checkUserToken, snnozecontroller.getSnoozeshedule)
 //------------snoozeupdate  Route api----------------------------
 router.put('/snoozeupdate/:id', checkUserToken, snnozecontroller.snoozeupdate);
 
-//------------get notification ---------------------------
-router.get('/getnotification', checkUserToken, snnozecontroller.getnotification);
-
 //-----------getuser------------------------------------------- 
 router.get('/getusers', checkUserToken, userController.getuser);
 
 //-----------useremail add--------------------------------------
 router.put('/adduser/:id', checkUserToken, userController.getemailuseradd);
 
-//-----------token add --------------------------------------
-router.post('/addtoken', checkUserToken, userController.gettoken);
+//-----------update user login status---------------------------------------
+router.get('/updateuserStatus/:id', checkUserToken, userController.userLoginStatus)
 
-//------------token get notificationOptions-------------------------------- 
-router.get('/notificationtokenget', checkUserToken,userController.gettokenNotification)
-
-
-//------------export router-------------------------------
+//------------export router-------------------------------------------------
 module.exports = router;

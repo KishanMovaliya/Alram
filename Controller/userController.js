@@ -1,10 +1,9 @@
-//----------------import packages---------------------------------
-
 //-----------import modals------------------------------
+
 const User = require("../models/users");
 const Usernew = require('../models/usernew')
 const EmailShedule = require('../models/shedulemodel')
-const TokenNotificationModel = require('../models/TokenNotification')
+const Userstatus = require('../models/UserStatus')
 
 //-----------Register user------------------------------
 exports.registerNewUser = async (req, res) => {
@@ -44,7 +43,6 @@ exports.loginUser = async (req, res) => {
         });
 
 
-
         //check if user exit
         if (!user) {
             res.status(400).json({
@@ -56,30 +54,55 @@ exports.loginUser = async (req, res) => {
         let match = await user.compareUserPassword(login.password, user.password);
 
         if (match) {
-            let token = await user.generateJwtToken({
-                user
-            }, "secret", {
-                expiresIn: 604800
-            })
-            if (token) {
-                let data = {
-                    token: token,
-                    userId: user._id
-                }
-                const userToken = new Usernew(data)
-                userToken.save((err, data) => {
-                    res.status(200).json({
-                        type: "sucess",
-                        msg: data
-                    })
-                })
+            let token;
+            const userToken = await Usernew.findOne({
+                userId: user._id
+            });
+            if (userToken) {
 
-                res.status(200).json({
-                    success: true,
-                    token: token,
-                    userCredentials: user
+                token = userToken.token;
+            } else {
+                token = await user.generateJwtToken({
+                    user
+                }, "secret", {
+                    expiresIn: 604800
+                })
+                await Usernew({
+                    userId: user._id,
+                    token: token
+                }).save((err, data) => {
+
                 })
             }
+
+            const userStatus = await Userstatus.findOne({
+                userId: user._id
+            })
+            if (userStatus) {
+                await Userstatus.findOneAndUpdate({
+                    userId: user._id
+                }, {
+                    $set: {
+                        isStatus: true
+                    }
+                }, (error, data) => {
+
+                })
+            } else {
+                let status = {
+                    isStatus: true,
+                    userId: user._id
+                }
+                const userstatus = await Userstatus(status)
+                userstatus.save((err, data) => {})
+            }
+
+            res.status(200).json({
+                success: true,
+                token: token,
+                userCredentials: user
+            })
+
         } else {
             res.status(400).json({
                 type: "Not Found",
@@ -113,10 +136,16 @@ exports.getloginuser = async (req, res) => {
 //logout user
 exports.logout = async (req, res) => {
     try {
-        req.user.deleteToken(req.token, (err, user) => {
-            if (err) return res.status(400).send(err);
-            res.sendStatus(200);
-        });
+        await Usernew.findOneAndDelete({
+            userId: req.User._id
+        }).then((err, data) => {})
+
+        await Userstatus.findOneAndDelete({
+            userId: req.User._id
+        }).then((err, data) => {
+
+        })
+        res.sendStatus(200);
     } catch (err) {
         res.status(400).json({
             type: "Not Found Logout",
@@ -210,7 +239,6 @@ exports.updateStatus = async (req, res, next) => {
         } else {
             res.json(data)
             return ("Status updated successfully")
-
         }
     })
 }
@@ -267,45 +295,49 @@ exports.getemailuseradd = async (req, res) => {
     })
 }
 
-//----------add token-----------------------------------------------------
-exports.gettoken = async (req, res) => {
+//-----------Get login user status----------------------------------------
+exports.userLoginStatus = async (req, res) => {
     try {
-        let user = await TokenNotificationModel.findOne({
-            notificationToken: req.body.notificationToken
-        });
-        if (user) {
-            return res.status(400).send('That Token already exisits!');
-        } else {
-            let datas = new TokenNotificationModel({
-                email: req.body.email,
-                userId: req.body.userId,
-                notificationToken: req.body.notificationToken,
-            })
-            let createtoken = await datas.save()
-            console.log(createtoken)
-            res.status(200).json({
-                msg: "User Token Update Successfully",
-                data: createtoken
-            })
-        }
-    } catch (err) {
-    }
-}
+        if (req.User) {
+            let status;
+            if (req.params.id == "1") {
+                status = false;
 
-//----------get token DAta----------------------------------------
-exports.gettokenNotification = async (req, res) => {
-    try {
-        let datas = await TokenNotificationModel.find({
-            userId: req.User._id
-        })
-        res.status(200).json({
-            data: datas
-        })
+                await Userstatus.findOneAndUpdate({
+                    userId: req.User._id
+                }, {
+                    $set: {
+
+                        isStatus: false
+                    }
+                }, (error, data) => {
+
+                })
+            } else {
+                status = true;
+
+                await Userstatus.findOneAndUpdate({
+                    userId: req.User._id
+                }, {
+                    $set: {
+
+                        isStatus: true
+                    }
+                }, (error, data) => {
+
+                })
+            }
+
+
+        }
+
+        res.status(200).json({})
 
     } catch (err) {
         res.status(400).json({
             type: "Not Found",
             msg: "Something Wrong"
         })
+
     }
 }
