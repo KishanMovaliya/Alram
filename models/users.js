@@ -22,7 +22,7 @@ const userSchema = new Schema({
     },
     isStatus:{
         type: Boolean
-    }
+    },
 }, {
     timestamps: true,
 });

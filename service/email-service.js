@@ -16,7 +16,6 @@ async function sendMail(req, res, next) {
     const EmailSchedule = EmailShedule.find().then((response) => {
       response.map(a => {
         let UserIdArray = [a.userId]
-
         if (a.useremail) {
           UserIdArray.concat(a.useremail)
         }
@@ -33,7 +32,6 @@ async function sendMail(req, res, next) {
           let loginUserIdArray = [];
           response.map((userObj) => {
             loginUserIdArray.push(userObj.userId)
-            // console.log(loginUserIdArray)
           })
           User.find({
             _id: {
@@ -47,7 +45,6 @@ async function sendMail(req, res, next) {
               userEmailList.push(userEmailObj.email)
             });
 
-            // const getemailuser = useremail.toString()
 
             //---------------DayOfWeek Get -----------------------------------------
             //  let  daysget = JSON.parse(JSON.stringify(a.day));
@@ -123,7 +120,7 @@ async function sendMail(req, res, next) {
                         snoozeStatus: true,
                         limitsend: 12,
                         notification: 0,
-                        userId: a._id
+                        userId: a.userId
                       })
                       datas.save()
                       //----------new user add email snooze--------------------
@@ -132,11 +129,13 @@ async function sendMail(req, res, next) {
                       let useremailall
                       let idget
                       getuseridemail.map(res => {
+                        console.log("res",res)
                         User.find({
                           _id: {
                             $in: res
                           }
                         }).then((response) => {
+                          console.log("response",response)
                           allUserEmail = response
                           allUserEmail.map(res => {
                             useremailall = res.email

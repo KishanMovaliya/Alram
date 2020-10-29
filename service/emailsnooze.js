@@ -19,11 +19,16 @@ async function sendMailsnooze(req, res, next) {
                     const allemail = a.email
                     //----------get user status------------------
                     const UserIdArray = [a.userId]
-                    await UserStatus.find({
-                            userId: UserIdArray,
-                            isStatus: true
-                        })
+                    UserStatus.find({
+                        userId: {
+                          $in: UserIdArray
+                        },
+                        isStatus: true
+                      }, {
+                        userId: 1
+                      })
                         .then(async result => {
+                            console.log(result)
                             let loginUserIdArray = [];
                             result.map((userObj) => {
                                 loginUserIdArray.push(userObj.userId)
@@ -41,7 +46,7 @@ async function sendMailsnooze(req, res, next) {
                                 response.map((userEmailObj) => {
                                     userEmailList.push(userEmailObj.email)
                                 });
-
+console.log(userEmailList)
                                 getid = a._id
                                 const setlimit = a.limitsend
                                 const getstatusOfSnooze = a.snoozeStatus

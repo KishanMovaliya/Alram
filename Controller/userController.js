@@ -11,6 +11,7 @@ exports.registerNewUser = async (req, res) => {
         let user = new User({
             name: req.body.name,
             email: req.body.email
+        
         })
         user.password = await user.hashPassword(req.body.password);
         const token = await user

@@ -23,7 +23,8 @@ let snoozeEmail = new Schema({
       type: Number
    },
    userId:{
-      type: String
+      type: mongoose.Schema.Types.ObjectID,
+      ref:"User"
    }
 
 }, {

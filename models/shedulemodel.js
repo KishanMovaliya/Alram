@@ -32,7 +32,8 @@ let SheduleEmail = new Schema({
       type: Boolean
    },
    userId: {
-      type: String
+      type: mongoose.Schema.Types.ObjectID,
+      ref:"User"
    },
    useremail: {
       'type': {
