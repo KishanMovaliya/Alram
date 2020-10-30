@@ -60,7 +60,7 @@ emailService.sendMail()
 emailsnoozeService.sendMailsnooze()
 
 //----------------User route for login signup---------------------------------
-const userRoutes = require('../backend/routes/user.route')
+const userRoutes = require('./routes/user.route')
 
 //----------------use the packages--------------------------------------------
 const app = express();
