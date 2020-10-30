@@ -41,9 +41,6 @@ let SheduleEmail = new Schema({
       },
       'value': [String]
    },
-   notificationToken: {
-      type:String
-   }
 }, {
    collection: 'sheduleEmail'
 })

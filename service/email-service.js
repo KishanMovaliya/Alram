@@ -10,6 +10,7 @@ const User = require('../models/users')
 const UserStatus = require('../models/UserStatus')
 
 
+
 //-----------------Send Mail function using Nodemailer----------- 
 async function sendMail(req, res, next) {
   try {
@@ -104,11 +105,10 @@ async function sendMail(req, res, next) {
                     if (err) {
                       return ("Error Occurs", err)
                     } else {
-
                       notifier.notify({
                         title: '🤩Email First Recieve🤩',
                         message: userEmailList,
-                        icon:'Terminal Icon',
+                        icon:'http://localhost:4001/public/img-01.png',
                         sound: true,
                         wait: true,
                       });
@@ -120,22 +120,22 @@ async function sendMail(req, res, next) {
                         snoozeStatus: true,
                         limitsend: 12,
                         notification: 0,
-                        userId: a.userId
+                        userId: a.userId,
+                        notification: 0
                       })
                       datas.save()
+
                       //----------new user add email snooze--------------------
                       getuseridemail = [a.useremail]
                       let allUserEmail
                       let useremailall
                       let idget
                       getuseridemail.map(res => {
-                        console.log("res",res)
                         User.find({
                           _id: {
                             $in: res
                           }
                         }).then((response) => {
-                          console.log("response",response)
                           allUserEmail = response
                           allUserEmail.map(res => {
                             useremailall = res.email
@@ -145,8 +145,9 @@ async function sendMail(req, res, next) {
                               time: time,
                               snoozeStatus: true,
                               limitsend: 12,
+                              userId: idget,
                               notification: 0,
-                              userId: idget
+                              statusRead:false
                             })
                             let mailDetails = {
                               from: "abd.bodara@gmail.com",
@@ -157,8 +158,10 @@ async function sendMail(req, res, next) {
                             mailTransporter.sendMail(mailDetails,
                               function (err, data) {
                                 if (err) {
+                                  console.log(err)
                                   return ("Error Occurs", err)
                                 } else {
+                                  console.log(data)
                                   if (useremailall == userEmailList) {
                                     notifier.notify({
                                       title: '🤩First Email Recieve🤩',
@@ -180,8 +183,6 @@ async function sendMail(req, res, next) {
 
               } else {}
             });
-
-
 
           })
         })

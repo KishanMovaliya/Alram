@@ -9,6 +9,7 @@ const scheduler = require('node-schedule');
 const snoozeshedule = require('../models/SnoozeModel')
 const UserStatus = require('../models/UserStatus')
 const User = require('../models/users')
+const notificationmodel = require('../models/Notificationmodel')
 
 //-----------------Send Mail function using Nodemailer----------- 
 async function sendMailsnooze(req, res, next) {
@@ -17,18 +18,19 @@ async function sendMailsnooze(req, res, next) {
             const snoozeshedules = snoozeshedule.find().then((response) => {
                 response.map(async a => {
                     const allemail = a.email
+                    const getnotification = a.notification
                     //----------get user status------------------
                     const UserIdArray = [a.userId]
                     UserStatus.find({
-                        userId: {
-                          $in: UserIdArray
-                        },
-                        isStatus: true
-                      }, {
-                        userId: 1
-                      })
+                            userId: {
+                                $in: UserIdArray
+                            },
+                            isStatus: true
+                        }, {
+                            userId: 1
+                        })
                         .then(async result => {
-                            console.log(result)
+
                             let loginUserIdArray = [];
                             result.map((userObj) => {
                                 loginUserIdArray.push(userObj.userId)
@@ -46,7 +48,7 @@ async function sendMailsnooze(req, res, next) {
                                 response.map((userEmailObj) => {
                                     userEmailList.push(userEmailObj.email)
                                 });
-console.log(userEmailList)
+
                                 getid = a._id
                                 const setlimit = a.limitsend
                                 const getstatusOfSnooze = a.snoozeStatus
@@ -65,7 +67,7 @@ console.log(userEmailList)
                                 //---------------Setting credentials-----------------------------
                                 let mailDetails = {
                                     from: "abd.bodara@gmail.com",
-                                    to: maillist,
+                                    to: a.email,
                                     subject: "The answer to life, the universe, and everything!❤️",
                                     html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Stop Snooze</a></button>',
                                 };
@@ -79,28 +81,26 @@ console.log(userEmailList)
                                                 if (err) {
                                                     return ("Error Occurs", err)
                                                 } else {
-                                                    if (userEmailList == allemail) {
-                                                        notifier.notify({
-                                                            title: '🤩New Snooze Email Recieve🤩 ',
-                                                            message: userEmailList,
-                                                            icon: 'dwb-logo.png',
-                                                            contentImage: 'blog.png',
-                                                            sound: true,
-                                                            wait: true,
-                                                            open: void 0,
-                                                            wait: false,
-                                                        });
-                                                    } else {
-                                                        res.status(401)
-                                                    }
-
-
                                                     //----------decreament limit and update ---------------------------
                                                     if (data) {
-                                                        let ab = setlimit - 1
+                                                        let getmessageTime = data.messageTime
+                                                        let getfrom = data.envelope.from
 
+                                                        let getdatanotification = new notificationmodel({
+                                                            messageTime: getmessageTime,
+                                                            from: getfrom,
+                                                            message: "a new notifications",
+                                                            useremail: a.email,
+                                                            userId:a.userId,
+                                                            statusRead:false
+                                                        })
+                                                        getdatanotification.save()
+
+                                                        let ab = setlimit - 1
+                                                        let note = getnotification + 1
                                                         const snoozeLimit = {
                                                             limitsend: ab,
+                                                            notification: note
                                                         }
                                                         snoozeshedule.findOneAndUpdate({
                                                             _id: (a._id)
@@ -114,6 +114,21 @@ console.log(userEmailList)
                                                             }
                                                         })
                                                     } //end limit update-------------------------------------------------
+
+                                                    //--display notification login user------------------
+                                                    if (userEmailList == allemail) {
+                                                        notifier.notify({
+                                                            title: '🤩New Snooze Email Recieve🤩 ',
+                                                            message: userEmailList,
+                                                            icon: 'http://localhost:4001/public/img-01.png',
+                                                            sound: true,
+                                                            wait: true,
+                                                            open: void 0,
+                                                            wait: false,
+                                                        })
+                                                    }
+                                                    //----------------------------------------------------
+
                                                 }
                                             });
 
@@ -140,14 +155,16 @@ console.log(userEmailList)
                                         //----------For limit over then send email for continue--------------------
                                         let mailDetails = {
                                             from: "abd.bodara@gmail.com",
-                                            to: maillist,
+                                            to: a.email,
                                             subject: "Your Snooze Email Sending limit is Over if u continue to Send Mail click on start snooze buttone",
                                             html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Stop Snooze</a></button>',
                                         };
                                         mailTransporter.sendMail(mailDetails, function (err, data) {
                                             if (err) {
                                                 return ("Error Occures", err)
-                                            } else {}
+                                            } else {
+
+                                            }
 
                                         }) //end here limit sending email
                                     } //end if else for check limit 

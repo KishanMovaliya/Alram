@@ -1,5 +1,6 @@
 //----------import model---------------------------------------------
 const SnoozeShedule = require('../models/SnoozeModel')
+const notificationmodel = require('../models/Notificationmodel')
 
 //----------get EmailShedule DAta----------------------------------------
 exports.getSnoozeshedule = async (req, res) => {
@@ -18,7 +19,7 @@ exports.snoozeupdate = async (req, res, next) => {
   const snoozeupdate = {
     snoozeStatus: req.body.snoozeStatus
   }
-  SnoozeShedule.findOneAndUpdate({
+  SnoozeShedule.findByIdAndUpdate({
     _id: ObjectId(req.params.id)
   }, {
     $set: snoozeupdate
@@ -31,4 +32,60 @@ exports.snoozeupdate = async (req, res, next) => {
       return ("update Snooze")
     }
   })
+}
+
+
+//----------get notificationmodel DAta-----------------------------
+exports.getnotification = async (req, res) => {
+  try {
+    let notification = await notificationmodel.find({
+      userId: req.User._id
+    }).sort({statusRead:false}) 
+    res.status(200).json({
+      data: notification
+    })
+  } catch (err) {
+    res.status(400)
+  }
+}
+
+//----------notification read unread
+exports.notificationreadunread = async (req, res) => {
+  var ObjectId = require('mongodb').ObjectID;
+  const statusupdate = {
+    statusRead: req.body.statusRead
+  }
+  notificationmodel.findByIdAndUpdate({
+    _id: ObjectId(req.params.id)
+  }, {
+    $set: statusupdate,
+    upsert: true,
+    new: true
+  }, (error, data) => {
+    if (error) {
+      console.log(error)
+      return next(error)
+    } else {
+      res.json(data)
+      return ("update Notification")
+    }
+  })
+}
+
+//----------get unread notificationmodel------------------
+exports.getunreaddata= async (req, res)=>{
+  try {
+    let notification = await notificationmodel.find({
+      userId: {
+        $in:req.User._id
+      },statusRead: false}, {
+        statusRead: 1
+      })
+    res.status(200).json({
+      data: notification
+    })
+  } catch (err) {
+    res.status(400)
+  }
+
 }

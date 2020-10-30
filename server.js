@@ -77,7 +77,7 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(cors());
-app.use(express.static('public'));
+app.use("/public",express.static('public'));
 // simple route
 app.get('/', function (req, res) {
     res.sendFile( __dirname + "/" + "index.html" );

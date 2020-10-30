@@ -8,7 +8,7 @@ const snnozecontroller = require("../Controller/snoozeController")
 const checkUserToken = require("../service/tokenmiddleware")
 
 
-//------------Defined the Router api-----------------------------
+//*****************************Defined the Router api*****************************************
 
 //------------register user Route api----------------------------
 router.post("/register", userController.registerNewUser);
@@ -51,6 +51,15 @@ router.put('/adduser/:id', checkUserToken, userController.getemailuseradd);
 
 //-----------update user login status---------------------------------------
 router.get('/updateuserStatus/:id', checkUserToken, userController.userLoginStatus)
+
+//------------get notification ---------------------------
+router.get('/getnotification', checkUserToken, snnozecontroller.getnotification);
+
+//-----------notification status----------------------------------------------- 
+router.put('/notificationstatus/:id', checkUserToken, snnozecontroller.notificationreadunread);
+
+//-----------Get unread Notification status-------------------------------------
+router.get('/getunreadstatus', checkUserToken, snnozecontroller.getunreaddata)
 
 //------------export router-------------------------------------------------
 module.exports = router;
