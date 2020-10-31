@@ -22,7 +22,7 @@ let notification = new Schema({
          },
          statusRead:{
              type: Boolean
-         }
+         },
     }, {
         timestamps: true,
     },

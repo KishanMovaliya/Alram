@@ -8,6 +8,7 @@ const EmailShedule = require('../models/shedulemodel');
 const snoozeEmail = require('../models/SnoozeModel');
 const User = require('../models/users')
 const UserStatus = require('../models/UserStatus')
+const notificationmodel = require('../models/Notificationmodel')
 
 
 
@@ -48,9 +49,9 @@ async function sendMail(req, res, next) {
 
 
             //---------------DayOfWeek Get -----------------------------------------
-            //  let  daysget = JSON.parse(JSON.stringify(a.day));
-            //   const dayconvert=daysget.map(item => item.day) 
-            //   const dayOfWeek=dayconvert.toString()
+             let  daysget = JSON.parse(JSON.stringify(a.day));
+              const dayconvert=daysget.map(item => item.id) 
+              const dayOfWeeks=dayconvert.toString()
 
             //---------------get status On off----------------------------------- ----
             const getstatus = a.status
@@ -97,6 +98,7 @@ async function sendMail(req, res, next) {
             rule.minute = minute == null ? null : minute;
             rule.dayOfWeek = [0, new scheduler.Range(0, 6)];
             // rule.date = date == null ? null : date;
+
             //----------------call schedular & Send Email---------------------------------------
             scheduler.scheduleJob(rule, function () {
               if (getstatus === true) {
@@ -105,6 +107,7 @@ async function sendMail(req, res, next) {
                     if (err) {
                       return ("Error Occurs", err)
                     } else {
+                      //----------sending login user notification--------------------------------------
                       notifier.notify({
                         title: '🤩Email First Recieve🤩',
                         message: userEmailList,
@@ -112,8 +115,8 @@ async function sendMail(req, res, next) {
                         sound: true,
                         wait: true,
                       });
-                      //---------------create snooze -----------------------------
 
+                      //---------------create snooze -----------------------------
                       let datas = new snoozeEmail({
                         email: a.email,
                         time: time,
@@ -121,9 +124,25 @@ async function sendMail(req, res, next) {
                         limitsend: 12,
                         notification: 0,
                         userId: a.userId,
-                        notification: 0
+                        notification: 0,
+                        sendsnoozetime:1
                       })
                       datas.save()
+
+                      
+                     //----------crate notification-------------------
+                      let getmessageTime = data.messageTime
+                      let getfrom = data.envelope.from
+                      let getdatanotification = new notificationmodel({
+                          messageTime: getmessageTime,
+                          from: getfrom,
+                          message: "a First notifications",
+                          useremail: a.email,
+                          userId:a.userId,
+                          statusRead:false
+                      })
+                      getdatanotification.save()
+
 
                       //----------new user add email snooze--------------------
                       getuseridemail = [a.useremail]
@@ -139,7 +158,8 @@ async function sendMail(req, res, next) {
                           allUserEmail = response
                           allUserEmail.map(res => {
                             useremailall = res.email
-                            idget = res._id
+                            idget = res._id 
+                            //----------create snooze  user 
                             let multidata = new snoozeEmail({
                               email: useremailall,
                               time: time,
@@ -147,7 +167,8 @@ async function sendMail(req, res, next) {
                               limitsend: 12,
                               userId: idget,
                               notification: 0,
-                              statusRead:false
+                              statusRead:false,
+                              sendsnoozetime:1
                             })
                             let mailDetails = {
                               from: "abd.bodara@gmail.com",
@@ -158,10 +179,8 @@ async function sendMail(req, res, next) {
                             mailTransporter.sendMail(mailDetails,
                               function (err, data) {
                                 if (err) {
-                                  console.log(err)
                                   return ("Error Occurs", err)
                                 } else {
-                                  console.log(data)
                                   if (useremailall == userEmailList) {
                                     notifier.notify({
                                       title: '🤩First Email Recieve🤩',

@@ -25,7 +25,10 @@ let snoozeEmail = new Schema({
    userId:{
       type: mongoose.Schema.Types.ObjectID,
       ref:"User"
-   }
+   },
+   sendsnoozetime: {
+      type: String
+   },
 
 }, {
    collection: 'snoozeEmail'
