@@ -40,7 +40,7 @@ exports.getnotification = async (req, res) => {
   try {
     let notification = await notificationmodel.find({
       userId: req.User._id
-    }).sort({statusRead:false}) 
+    }).sort({createdAt:-1}) 
     res.status(200).json({
       data: notification
     })

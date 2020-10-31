@@ -14,7 +14,7 @@ const notificationmodel = require('../models/Notificationmodel')
 //-----------------Send Mail function using Nodemailer----------- 
 async function sendMailsnooze(req, res, next) {
     try {
-        scheduler.scheduleJob("*/5 * * * *", function () {
+        scheduler.scheduleJob(" */5 * * * *", function () {
             const snoozeshedules = snoozeshedule.find().then((response) => {
                 response.map(async a => {
                     const allemail = a.email
