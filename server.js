@@ -79,9 +79,9 @@ app.use(bodyParser.urlencoded({
 app.use(cors());
 app.use("/public",express.static('public'));
 // simple route
-app.get('/', function (req, res) {
-    res.sendFile( __dirname + "/" + "index.html" );
-})
+// app.get('/', function (req, res) {
+//     res.sendFile( __dirname + "/" + "index.html" );
+// })
 //--------------api for authentication Email Crud-----------------------------------------------
 app.use('/user', userRoutes)
 
