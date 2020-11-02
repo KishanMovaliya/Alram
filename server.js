@@ -91,7 +91,7 @@ app.get('/', function (req, res) {
 app.use('/user', userRoutes)
 
 //--------------Create port----------------------------------------------------------
-const port = process.env.PORT || 4001;
+const port = process.env.PORT || 5000;
 const server = app.listen(port, () => {
     console.log('Connected to port ' + port)
 })
