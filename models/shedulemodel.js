@@ -7,28 +7,40 @@ let SheduleEmail = new Schema({
    email: {
       type: String
    },
-   date:{
+   date: {
       type: Date
    },
-   time:{
-      type:String
-   },
-   day:{
-      'type': {type: String},
-		'value': [String]
-   },
-   status:{
-      type:Boolean
-   },
-   stepday:{
-    type:String
-   },
-   snoozeTime:{
+   time: {
       type: String
    },
-   stopsnooze:{
-      type:Boolean
-   }
+   day: {
+      'type': {
+         type: String
+      },
+      'value': [String]
+   },
+   status: {
+      type: Boolean
+   },
+   stepday: {
+      type: String
+   },
+   snoozeTime: {
+      type: String
+   },
+   stopsnooze: {
+      type: Boolean
+   },
+   userId: {
+      type: mongoose.Schema.Types.ObjectID,
+      ref:"User"
+   },
+   useremail: {
+      'type': {
+         type: String
+      },
+      'value': [String]
+   },
 }, {
    collection: 'sheduleEmail'
 })

@@ -7,15 +7,29 @@ let snoozeEmail = new Schema({
    email: {
       type: String
    },
-   time:{
-      type:String
+   time: {
+      type: String
    },
-   stopsnooze:{
-      type:Boolean
+   stopsnooze: {
+      type: Boolean
    },
-   snoozeStatus:{
-       type:Boolean
-   }
+   snoozeStatus: {
+      type: Boolean
+   },
+   limitsend: {
+      type: Number
+   },
+   notification: {
+      type: Number
+   },
+   userId:{
+      type: mongoose.Schema.Types.ObjectID,
+      ref:"User"
+   },
+   sendsnoozetime: {
+      type: String
+   },
+
 }, {
    collection: 'snoozeEmail'
 })
