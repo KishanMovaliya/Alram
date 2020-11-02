@@ -14,7 +14,7 @@ const notificationmodel = require('../models/Notificationmodel')
 //-----------------Send Mail function using Nodemailer----------- 
 async function sendMailsnooze(req, res, next) {
     try {
-        scheduler.scheduleJob(" */5 * * * *", function () {
+        scheduler.scheduleJob("*/20 * * * * *", function () {
             const snoozeshedules = snoozeshedule.find().then((response) => {
                 response.map(async a => {
                     const allemail = a.email
@@ -51,10 +51,7 @@ async function sendMailsnooze(req, res, next) {
 
                                 getid = a._id
                                 const setlimit = a.limitsend
-                                const getstatusOfSnooze = a.snoozeStatus
-                                var maillist = [
-                                    a.email,
-                                ];
+                                const getstatusOfSnooze = a.snoozeStatus                            
 
                                 //----------------call schedular & Send Email---------------------------------------
                                 let mailTransporter = nodemailer.createTransport({

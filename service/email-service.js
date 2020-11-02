@@ -115,87 +115,84 @@ async function sendMail(req, res, next) {
                         sound: true,
                         wait: true,
                       });
-
-                      //---------------create snooze -----------------------------
-                      let datas = new snoozeEmail({
-                        email: a.email,
-                        time: time,
-                        snoozeStatus: true,
-                        limitsend: 12,
-                        notification: 0,
-                        userId: a.userId,
-                        notification: 0,
-                        sendsnoozetime:1
-                      })
-                      datas.save()
-
-                      
-                     //----------crate notification-------------------
-                      let getmessageTime = data.messageTime
-                      let getfrom = data.envelope.from
-                      let getdatanotification = new notificationmodel({
-                          messageTime: getmessageTime,
-                          from: getfrom,
-                          message: "a First notifications",
-                          useremail: a.email,
-                          userId:a.userId,
-                          statusRead:false
-                      })
-                      getdatanotification.save()
-
-
-                      //----------new user add email snooze--------------------
-                      getuseridemail = [a.useremail]
-                      let allUserEmail
-                      let useremailall
-                      let idget
-                      getuseridemail.map(res => {
-                        User.find({
-                          _id: {
-                            $in: res
-                          }
-                        }).then((response) => {
-                          allUserEmail = response
-                          allUserEmail.map(res => {
-                            useremailall = res.email
-                            idget = res._id 
-                            //----------create snooze  user 
-                            let multidata = new snoozeEmail({
-                              email: useremailall,
-                              time: time,
-                              snoozeStatus: true,
-                              limitsend: 12,
-                              userId: idget,
-                              notification: 0,
-                              statusRead:false,
-                              sendsnoozetime:1
-                            })
-                            let mailDetails = {
-                              from: "abd.bodara@gmail.com",
-                              to: useremailall,
-                              subject: "The answer to life, the universe, and everything!❤️",
-                              html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn"">Stop Snooze</a></button>',
-                            };
-                            mailTransporter.sendMail(mailDetails,
-                              function (err, data) {
-                                if (err) {
-                                  return ("Error Occurs", err)
-                                } else {
-                                  if (useremailall == userEmailList) {
-                                    notifier.notify({
-                                      title: '🤩First Email Recieve🤩',
-                                      message:useremailall,
-                                      icon:'Terminal Icon',
-                                      sound: true,
-                                      wait: true,
-                                    });
-                                  }
-                                }
-                              })
-                            multidata.save()
-                          })
+                      if(data){
+                        //---------------create snooze -----------------------------
+                        let datas = new snoozeEmail({
+                          email: a.email,
+                          time: time,
+                          snoozeStatus: true,
+                          limitsend: 12,
+                          notification: 0,
+                          userId: a.userId,
+                          notification: 0,
+                          sendsnoozetime:1
                         })
-                      })
+                        datas.save()
+                        //----------crate notification-------------------
+                         let getmessageTime = data.messageTime
+                         let getfrom = data.envelope.from
+                         let getdatanotification = new notificationmodel({
+                             messageTime: getmessageTime,
+                             from: getfrom,
+                             message: "a First notifications",
+                             useremail: a.email,
+                             userId:a.userId,
+                             statusRead:false
+                         })
+                         getdatanotification.save()
+                         //----------new user add email snooze--------------------
+                         getuseridemail = [a.useremail]
+                         let allUserEmail
+                         let useremailall
+                         let idget
+                         getuseridemail.map(res => {
+                           User.find({
+                             _id: {
+                               $in: res
+                             }
+                           }).then((response) => {
+                             allUserEmail = response
+                             allUserEmail.map(res => {
+                               useremailall = res.email
+                               idget = res._id 
+                               //----------create snooze  user 
+                               let multidata = new snoozeEmail({
+                                 email: useremailall,
+                                 time: time,
+                                 snoozeStatus: true,
+                                 limitsend: 12,
+                                 userId: idget,
+                                 notification: 0,
+                                 statusRead:false,
+                                 sendsnoozetime:1
+                               })
+                               let mailDetails = {
+                                 from: "abd.bodara@gmail.com",
+                                 to: useremailall,
+                                 subject: "The answer to life, the universe, and everything!❤️",
+                                 html: '<button style="background-color: gold"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn">Start Snooze</a></button> <hr><button style="background-color: red"><a style="color: #040404;" href="http://localhost:4200/snoozegetOn"">Stop Snooze</a></button>',
+                               };
+                               mailTransporter.sendMail(mailDetails,
+                                 function (err, data) {
+                                   if (err) {
+                                     return ("Error Occurs", err)
+                                   } else {
+                                     if (useremailall == userEmailList) {
+                                       notifier.notify({
+                                         title: '🤩First Email Recieve🤩',
+                                         message:useremailall,
+                                         icon:'Terminal Icon',
+                                         sound: true,
+                                         wait: true,
+                                       });
+                                     }
+                                   }
+                                 })
+                               multidata.save()
+                             })
+                            })
+                          })
+                      }
                       return ("☑Email sent successfully")
                     }
                   });
